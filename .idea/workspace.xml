@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d352a1b8-390e-4752-9ca6-4eefb8bc7de1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NER/lstm_crf/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/lstm_crf/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NER/lstm_crf/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/lstm_crf/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -41,7 +42,7 @@
       <recent name="$PROJECT_DIR$/text_classification/data/toutiao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.tools">
     <configuration name="get_token_dic" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="keras_nlp_tutorial" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -84,7 +85,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="train (2)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="tools" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="keras_nlp_tutorial" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -92,11 +93,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/text_classification/bert_cls" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/NER/lstm_crf" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/text_classification/bert_cls/train.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/NER/lstm_crf/tools.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -149,18 +150,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.preprocess1" />
-      <item itemvalue="Python.train (2)" />
       <item itemvalue="Python.get_token_dic" />
       <item itemvalue="Python.visual (1)" />
       <item itemvalue="Python.train" />
+      <item itemvalue="Python.tools" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.tools" />
         <item itemvalue="Python.train" />
         <item itemvalue="Python.visual (1)" />
         <item itemvalue="Python.get_token_dic" />
         <item itemvalue="Python.preprocess1" />
-        <item itemvalue="Python.train (2)" />
       </list>
     </recent_temporary>
   </component>
@@ -198,22 +199,22 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="508" y="211" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1589881197379" />
-    <state width="1419" height="245" key="GridCell.Tab.0.bottom" timestamp="1590573557365">
+    <state width="1419" height="245" key="GridCell.Tab.0.bottom" timestamp="1590584060286">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1590573557365" />
-    <state width="1419" height="245" key="GridCell.Tab.0.center" timestamp="1590573557363">
+    <state width="1419" height="245" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1590584060286" />
+    <state width="1419" height="245" key="GridCell.Tab.0.center" timestamp="1590584060284">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1590573557363" />
-    <state width="1419" height="245" key="GridCell.Tab.0.left" timestamp="1590573557362">
+    <state width="1419" height="245" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1590584060284" />
+    <state width="1419" height="245" key="GridCell.Tab.0.left" timestamp="1590584060283">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1590573557362" />
-    <state width="1419" height="245" key="GridCell.Tab.0.right" timestamp="1590573557364">
+    <state width="1419" height="245" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1590584060283" />
+    <state width="1419" height="245" key="GridCell.Tab.0.right" timestamp="1590584060285">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1590573557364" />
+    <state width="1419" height="245" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1590584060285" />
     <state x="229" y="89" key="SettingsEditor" timestamp="1590560894253">
       <screen x="0" y="0" width="1440" height="900" />
     </state>

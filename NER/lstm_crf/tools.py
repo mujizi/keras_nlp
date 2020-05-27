@@ -268,3 +268,8 @@ def append_jsonlines(dest_filename, items, encoding=__ENCODING_UTF8):
     with open(dest_filename, 'a', encoding=encoding) as f:
         for item in items:
             f.write(json.dumps(item, ensure_ascii=False) + '\n')
+
+if __name__ == '__main__':
+    a = {'a':1, 'b':2}
+    b = {str(i): str(v) for i, v in a.items()}
+    print(b)

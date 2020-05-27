@@ -7,12 +7,18 @@ import json
 import numpy as np
 import pandas as pd
 from keras import Model
+from keras.models import load_model
+from keras_contrib.losses import crf_loss
+from keras_contrib.metrics import crf_accuracy
+from keras_contrib.metrics import crf_marginal_accuracy
+from keras_contrib.metrics import crf_viterbi_accuracy
 from keras.utils import to_categorical
 from tools import read_jsonline, read_json
-from keras.layers.merge import concatenate
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Embedding, Dense, Conv1D, Flatten, Input, MaxPool1D, Dropout, LSTM, Bidirectional, TimeDistributed
+from keras.layers import Embedding, Dense, Input, LSTM, Bidirectional, TimeDistributed
 from keras_contrib.layers import CRF
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def seq_padding(x, pad_len, value=0):
@@ -54,9 +60,9 @@ class Data_generator:
                 if self.batch_size == len(x_l) or idxs[-1] == i:
                     """一个batch出队"""
                     x_index = [[self.token_dict.get(word) for word in sen] for sen in x_l]
-                    x_padding = seq_padding(x_index, self.max_len)
+                    x_padding = seq_padding(x_index, 140)
                     y_index = [[self.label_dict.get(j) for j in i] for i in y_l]
-                    y_padding = seq_padding(y_index, self.max_len, self.label_dict["O"])
+                    y_padding = seq_padding(y_index, 140, self.label_dict["O"])
                     y_one_hot = np.array([to_categorical(i, len(self.label_dict)) for i in y_padding])
                     yield x_padding, y_one_hot
                     x_l, y_l = [], []
@@ -103,7 +109,7 @@ class LstmCrf:
                                            epochs=10,
                                            callbacks=callbacks_list,
                                            validation_data=self.v_generator.__iter__(),
-                                           nb_val_samples=len(v_generator))
+                                           nb_val_samples=len(self.v_generator))
 
         with open('trainHistoryDict.txt', 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
@@ -112,16 +118,33 @@ class LstmCrf:
         pass
 
 
+def predict(model_path, test_data, token_dict, i2label):
+    model = load_model(model_path, custom_objects={'CRF': CRF,
+                                                   'crf_loss': crf_loss,
+                                                   'crf_viterbi_accuracy': crf_viterbi_accuracy})
+
+    x_index = [[token_dict.get(word) for word in sen] for sen in test_data]
+    x_padding = seq_padding(x_index, 140)
+    out = model.predict(x_padding)
+    out = np.argmax(out, axis=2)
+    out = [[i2label.get(str(word)) for word in sentence]for sentence in out]
+    return out
+
+
 if __name__ == '__main__':
-    ROOT_PATH = '/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/'
+    ROOT_PATH = '/content/drive/My Drive/NER/'
     path = ROOT_PATH + 'data/raw_data/dataset.jsonl'
+    model_path = ROOT_PATH + 'lstm_crf/lstm_crf.h5'
     data = read_jsonline(path)
     train_data = data[:int(len(data) * 0.8)]
     val_data = data[int(len(data) * 0.8):]
     token_dict = read_json(ROOT_PATH + 'data/raw_data/token2i.json')
     label_dict = read_json(ROOT_PATH + 'data/raw_data/label2i.json')
-    generator = Data_generator(train_data, token_dict, label_dict)
-    v_generator = Data_generator(val_data, token_dict, label_dict)
-    lstm_crf = LstmCrf(token_dict, generator, v_generator)
-    lstm_crf.train()
+    i2label = {str(v): str(i) for i, v in label_dict.items()}
+    # generator = Data_generator(train_data, token_dict, label_dict)
+    # v_generator = Data_generator(val_data, token_dict, label_dict)
+    # lstm_crf = LstmCrf(token_dict, generator, v_generator)
+    # lstm_crf.train()
 
+    test_data = [i['word'] for i in val_data]
+    predict(model_path, test_data, token_dict, i2label)
