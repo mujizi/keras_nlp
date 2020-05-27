@@ -11,7 +11,7 @@ __pycache__/
 # Distribution / packaging
 /text_classification/data
 /text_classification/bert_cls/chinese_wwm
-
+/MRC/data/
 /NER/data/
 
 
@@ -147,3 +147,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+NLG/
