@@ -11,7 +11,8 @@ from keras.utils import to_categorical
 from tools import read_jsonline, read_json
 from keras.layers.merge import concatenate
 from keras.callbacks import EarlyStopping, ModelCheckpoint
-from keras.layers import Embedding, Dense, Conv1D, Flatten, Input, MaxPool1D, Dropout, LSTM, Bidirectional
+from keras.layers import Embedding, Dense, Conv1D, Flatten, Input, MaxPool1D, Dropout, LSTM, Bidirectional, TimeDistributed
+from keras_contrib.layers import CRF
 
 
 def seq_padding(x, pad_len, value=0):
@@ -29,7 +30,7 @@ def to_onehot(y, label2i):
 
 
 class Data_generator:
-    def __init__(self, data, token_dict, label_dict, batch_size=2):
+    def __init__(self, data, token_dict, label_dict, batch_size=10):
         self.data = data
         self.batch_size = batch_size
         self.token_dict = token_dict
@@ -56,12 +57,12 @@ class Data_generator:
                     x_padding = seq_padding(x_index, self.max_len)
                     y_index = [[self.label_dict.get(j) for j in i] for i in y_l]
                     y_padding = seq_padding(y_index, self.max_len, self.label_dict["O"])
-                    y_one_hot = [to_categorical(i, len(self.label_dict)) for i in y_padding]
+                    y_one_hot = np.array([to_categorical(i, len(self.label_dict)) for i in y_padding])
                     yield x_padding, y_one_hot
                     x_l, y_l = [], []
 
 
-class TextCNN:
+class LstmCrf:
     def __init__(self, token_dict, generator, v_generator):
         self.token_dict = token_dict
         self.generator = generator
@@ -72,26 +73,37 @@ class TextCNN:
         input = Input(shape=(140,), dtype='float64')
         embeder = Embedding(len(self.token_dict), 300, input_length=140, trainable=False)
         embed = embeder(input)
-        LSTM
-
+        bilstm = Bidirectional(LSTM(units=300,
+                             return_sequences=True,
+                             dropout=0.5,
+                             recurrent_dropout=0.5))(embed)
+        lstm = LSTM(units=300 * 2,
+                    return_sequences=True,
+                    dropout=0.5,
+                    recurrent_dropout=0.5)(bilstm)
+        out = TimeDistributed(Dense(17, activation='relu'))(lstm)
+        crf = CRF(17)
+        out = crf(out)
+        model = Model(input, out)
+        model.compile(optimizer='adam', loss=crf.loss_function, metrics=[crf.accuracy, 'accuracy'])
         model.summary()
         return model
 
     def train(self):
         callbacks_list = [
             EarlyStopping(monitor="val_accuracy",
-                          patience=1),
-            ModelCheckpoint(filepath='TextCNN.h5',
+                          patience=5),
+            ModelCheckpoint(filepath='lstm_crf.h5',
                             monitor='val_loss',
                             save_best_only=True)
         ]
 
         history = self.model.fit_generator(self.generator.__iter__(),
-                                           steps_per_epoch=10000,
-                                           epochs=3,
+                                           steps_per_epoch=len(self.generator),
+                                           epochs=10,
                                            callbacks=callbacks_list,
                                            validation_data=self.v_generator.__iter__(),
-                                           nb_val_samples=2000)
+                                           nb_val_samples=len(v_generator))
 
         with open('trainHistoryDict.txt', 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
@@ -103,9 +115,13 @@ class TextCNN:
 if __name__ == '__main__':
     ROOT_PATH = '/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/'
     path = ROOT_PATH + 'data/raw_data/dataset.jsonl'
-    train_data = read_jsonline(path)
+    data = read_jsonline(path)
+    train_data = data[:int(len(data) * 0.8)]
+    val_data = data[int(len(data) * 0.8):]
     token_dict = read_json(ROOT_PATH + 'data/raw_data/token2i.json')
     label_dict = read_json(ROOT_PATH + 'data/raw_data/label2i.json')
     generator = Data_generator(train_data, token_dict, label_dict)
-    print(generator.max_len)
-    print(generator.__iter__().__next__())
+    v_generator = Data_generator(val_data, token_dict, label_dict)
+    lstm_crf = LstmCrf(token_dict, generator, v_generator)
+    lstm_crf.train()
+
