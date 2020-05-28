@@ -16,7 +16,7 @@ def get_dic(path, t2i_path, l2i_path):
 
 
 if __name__ == '__main__':
-    path = "/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/data/raw_data/dataset.jsonl"
-    token_dic_path = "/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/data/raw_data/token2i.json"
-    labels_dic_path = "/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/data/raw_data/label2i.json"
+    path = "/NER/lstm_crf/data/raw_data/dataset.jsonl"
+    token_dic_path = "/NER/lstm_crf/data/raw_data/token2i.json"
+    labels_dic_path = "/NER/lstm_crf/data/raw_data/label2i.json"
     get_dic(path, token_dic_path, labels_dic_path)

@@ -52,8 +52,8 @@ def build_jsonline(sentences, dest_path):
 
 
 if __name__ == '__main__':
-    raw_path = "/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/data/raw_data/ner.csv"
-    dest_path = "/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/data/raw_data/dataset.csv"
+    raw_path = "/NER/lstm_crf/data/raw_data/ner.csv"
+    dest_path = "/NER/lstm_crf/data/raw_data/dataset.csv"
     dest_jsonl = "/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/data/raw_data/dataset.jsonl"
     dataset = get_dataset(raw_path, dest_path)
     getter = SentenceGetter(dataset)
