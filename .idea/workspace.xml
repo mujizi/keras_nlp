@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d352a1b8-390e-4752-9ca6-4eefb8bc7de1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NER/lstm_crf/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/lstm_crf/tools.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/NER/lstm_crf/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/lstm_crf/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -149,7 +149,7 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.preprocess1" />
+      <item itemvalue="Python.preprocess" />
       <item itemvalue="Python.get_token_dic" />
       <item itemvalue="Python.visual (1)" />
       <item itemvalue="Python.train" />
@@ -161,7 +161,6 @@
         <item itemvalue="Python.train" />
         <item itemvalue="Python.visual (1)" />
         <item itemvalue="Python.get_token_dic" />
-        <item itemvalue="Python.preprocess1" />
       </list>
     </recent_temporary>
   </component>
@@ -199,22 +198,22 @@
       <screen x="0" y="0" width="1440" height="900" />
     </state>
     <state x="508" y="211" key="FileChooserDialogImpl/0.0.1440.900@0.0.1440.900" timestamp="1589881197379" />
-    <state width="1419" height="245" key="GridCell.Tab.0.bottom" timestamp="1590584060286">
+    <state width="1419" height="245" key="GridCell.Tab.0.bottom" timestamp="1590593017760">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1590584060286" />
-    <state width="1419" height="245" key="GridCell.Tab.0.center" timestamp="1590584060284">
+    <state width="1419" height="245" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1590593017760" />
+    <state width="1419" height="245" key="GridCell.Tab.0.center" timestamp="1590593017757">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1590584060284" />
-    <state width="1419" height="245" key="GridCell.Tab.0.left" timestamp="1590584060283">
+    <state width="1419" height="245" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1590593017757" />
+    <state width="1419" height="245" key="GridCell.Tab.0.left" timestamp="1590593017756">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1590584060283" />
-    <state width="1419" height="245" key="GridCell.Tab.0.right" timestamp="1590584060285">
+    <state width="1419" height="245" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1590593017756" />
+    <state width="1419" height="245" key="GridCell.Tab.0.right" timestamp="1590593017759">
       <screen x="0" y="0" width="1440" height="900" />
     </state>
-    <state width="1419" height="245" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1590584060285" />
+    <state width="1419" height="245" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1590593017759" />
     <state x="229" y="89" key="SettingsEditor" timestamp="1590560894253">
       <screen x="0" y="0" width="1440" height="900" />
     </state>

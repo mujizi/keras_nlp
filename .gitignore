@@ -13,7 +13,7 @@ __pycache__/
 /text_classification/bert_cls/chinese_wwm
 /MRC/data/
 /NER/data/
-
+/NER/CCKS_2017/data/
 
 
 .Python

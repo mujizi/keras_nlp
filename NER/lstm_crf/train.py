@@ -8,15 +8,13 @@ import numpy as np
 import pandas as pd
 from keras import Model
 from keras.models import load_model
+from keras_contrib.layers import CRF
 from keras_contrib.losses import crf_loss
-from keras_contrib.metrics import crf_accuracy
-from keras_contrib.metrics import crf_marginal_accuracy
 from keras_contrib.metrics import crf_viterbi_accuracy
 from keras.utils import to_categorical
 from tools import read_jsonline, read_json
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Embedding, Dense, Input, LSTM, Bidirectional, TimeDistributed
-from keras_contrib.layers import CRF
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
