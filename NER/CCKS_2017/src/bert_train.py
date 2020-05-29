@@ -17,6 +17,7 @@ from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
+"""本文件有bug"""
 def seq_padding(x, pad_len, value=0):
     return np.array([np.concatenate([i, [value] * (pad_len - len(i))]) if len(i) < pad_len else i[:pad_len] for i in x])
 

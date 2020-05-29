@@ -2,7 +2,7 @@
 # @Time    : 2020/5/29 下午2:36
 # @Author  : Benqi
 
-
+import tqdm
 import codecs
 import numpy as np
 from tools import read_jsonline
@@ -84,12 +84,11 @@ class Data_generator:
 
 
 class PretrainCrf:
-    def __init__(self, dict_path, config_path, checkpoint_path, generator, v_generator):
+    def __init__(self, dict_path, config_path, checkpoint_path, generator):
         self.dict_path = dict_path
         self.config_path = config_path
         self.checkpoint_path = checkpoint_path
         self.generator = generator
-        self.v_generator = v_generator
         self.model = self.build_model()
 
     def build_model(self):
@@ -101,24 +100,104 @@ class PretrainCrf:
         output_layer = 'Transformer-%s-FeedForward-Norm' % (12 - 1)
         output = model.get_layer(output_layer).output
         output = Dense(11)(output)
-        CRF = ConditionalRandomField(lr_multiplier=1000)
-        output = CRF(output)
+        self.CRF = ConditionalRandomField(lr_multiplier=1000)
+        output = self.CRF(output)
 
         model = Model(model.input, output)
         model.summary()
-        model.compile(loss=CRF.sparse_loss,
+        model.compile(loss=self.CRF.sparse_loss,
                       optimizer=Adam(1e-5),
-                      metrics=[CRF.sparse_accuracy]
+                      metrics=[self.CRF.sparse_accuracy]
         )
         return model
 
-    def train(self):
+    def train(self, eva):
         self.model.fit_generator(generator.__iter__(),
                                  steps_per_epoch=len(self.generator),
-                                 epochs=3)
+                                 epochs=3,
+                                 callbacks=[eva])
 
-    def predict(self):
-        pass
+
+def viterbi_decode(nodes, trans):
+    """Viterbi算法求最优路径
+    其中nodes.shape=[seq_len, num_labels],
+        trans.shape=[num_labels, num_labels].
+    """
+    labels = np.arange(11).reshape((1, -1))
+    scores = nodes[0].reshape((-1, 1))
+    scores[1:] -= np.inf  # 第一个标签必然是0
+    paths = labels
+    for l in range(1, len(nodes)):
+        M = scores + trans + nodes[l].reshape((1, -1))
+        idxs = M.argmax(0)
+        scores = M.max(0).reshape((-1, 1))
+        paths = np.concatenate([paths[:, idxs], labels], 0)
+    return paths[:, scores[0].argmax()]
+
+
+def named_entity_recognize(text, model, CRF, id2class):
+    """命名实体识别函数
+    """
+    tokens = tokenizer.tokenize(text)
+    while len(tokens) > 512:
+        tokens.pop(-2)
+    token_ids = tokenizer.tokens_to_ids(tokens)
+    segment_ids = [0] * len(token_ids)
+    nodes = model.predict([[token_ids], [segment_ids]])[0]
+    trans = K.eval(CRF.trans)
+    labels = viterbi_decode(nodes, trans)[1:-1]
+    entities, starting = [], False
+    for token, label in zip(tokens[1:-1], labels):
+        if label > 0:
+            if label % 2 == 1:
+                starting = True
+                entities.append([[token], id2class[(label - 1) // 2]])
+            elif starting:
+                entities[-1][0].append(token)
+            else:
+                starting = False
+        else:
+            starting = False
+    return [(tokenizer.decode(w, w).replace(' ', ''), l) for w, l in entities]
+
+
+def evaluate(data, model, crf, i2tag_dict):
+    """评测函数
+    """
+    X, Y, Z = 1e-10, 1e-10, 1e-10
+    for d in tqdm(data):
+        text = ''.join([i[0] for i in d])
+        R = set(named_entity_recognize(text, model, crf, i2tag_dict))
+        T = set([tuple(i) for i in d if i[1] != 'O'])
+        X += len(R & T)
+        Y += len(R)
+        Z += len(T)
+    f1, precision, recall = 2 * X / (Y + Z), X / Y, X / Z
+    return f1, precision, recall
+
+
+class Evaluate(keras.callbacks.Callback):
+    def __init__(self, model, crf, i2tag_dict, valid, test):
+        self.best_val_f1 = 0
+        self.model = model
+        self.CRF = crf
+        self.i2tag_dict = i2tag_dict
+        self.valid_data = valid
+        self.test_data = test
+
+    def on_epoch_end(self, epoch, logs=None):
+        trans = K.eval(self.CRF.trans)
+        print(trans)
+        f1, precision, recall = evaluate(self.valid_data, self.model, self.CRF, self.i2tag_dict)
+        # 保存最优
+        if f1 >= self.best_val_f1:
+            self.best_val_f1 = f1
+            self.model.save_weights('./best_model.weights')
+        print('valid:  f1: %.5f, precision: %.5f, recall: %.5f, best f1: %.5f\n' %
+              (f1, precision, recall, self.best_val_f1))
+        f1, precision, recall = evaluate(self.test_data, self.model, self.CRF, self.i2tag_dict)
+        print('test:  f1: %.5f, precision: %.5f, recall: %.5f\n' %
+              (f1, precision, recall))
 
 
 if __name__ == '__main__':
@@ -143,8 +222,13 @@ if __name__ == '__main__':
     num = int(len(data) * 0.8)
     train_data = data[:num]
     val_data = data[num:]
+    test_data = data[num:]
     generator = Data_generator(train_data, dict_path, tag2i_dict, 256)
     v_generator = Data_generator(val_data, dict_path, tag2i_dict, 256)
-    bert_crf = PretrainCrf(dict_path, config_path, checkpoint_path, generator, v_generator)
-    bert_crf.train()
+    tokenizer = generator.tokenizer
+    bert_crf = PretrainCrf(dict_path, config_path, checkpoint_path, generator)
+    eva = Evaluate(bert_crf.model, bert_crf.CRF, i2tag_dict, val_data, test_data)
+    bert_crf.train(eva)
+
+
 
