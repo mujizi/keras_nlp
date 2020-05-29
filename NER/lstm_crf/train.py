@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2020/5/27 下午3:08
 # @Author  : Benqi
+
 import pickle
-import jieba
-import json
 import numpy as np
-import pandas as pd
 from keras import Model
-from keras.models import load_model
-from keras_contrib.layers import CRF
-from keras_contrib.losses import crf_loss
-from keras_contrib.metrics import crf_viterbi_accuracy
-from keras.utils import to_categorical
+from bert4keras.layers import ConditionalRandomField
 from tools import read_jsonline, read_json
-from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.layers import Embedding, Dense, Input, LSTM, Bidirectional, TimeDistributed
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -61,8 +54,7 @@ class Data_generator:
                     x_padding = seq_padding(x_index, 140)
                     y_index = [[self.label_dict.get(j) for j in i] for i in y_l]
                     y_padding = seq_padding(y_index, 140, self.label_dict["O"])
-                    y_one_hot = np.array([to_categorical(i, len(self.label_dict)) for i in y_padding])
-                    yield x_padding, y_one_hot
+                    yield x_padding, y_padding
                     x_l, y_l = [], []
 
 
@@ -86,28 +78,17 @@ class LstmCrf:
                     dropout=0.5,
                     recurrent_dropout=0.5)(bilstm)
         out = TimeDistributed(Dense(17, activation='relu'))(lstm)
-        crf = CRF(17)
-        out = crf(out)
+        CRF = ConditionalRandomField(17)
+        out = CRF(out)
         model = Model(input, out)
-        model.compile(optimizer='adam', loss=crf.loss_function, metrics=[crf.accuracy, 'accuracy'])
+        model.compile(optimizer='adam', loss=CRF.sparse_loss, metrics=[CRF.sparse_accuracy])
         model.summary()
         return model
 
     def train(self):
-        callbacks_list = [
-            EarlyStopping(monitor="val_accuracy",
-                          patience=5),
-            ModelCheckpoint(filepath='lstm_crf.h5',
-                            monitor='val_loss',
-                            save_best_only=True)
-        ]
-
         history = self.model.fit_generator(self.generator.__iter__(),
                                            steps_per_epoch=len(self.generator),
-                                           epochs=10,
-                                           callbacks=callbacks_list,
-                                           validation_data=self.v_generator.__iter__(),
-                                           nb_val_samples=len(self.v_generator))
+                                           epochs=10)
 
         with open('trainHistoryDict.txt', 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
@@ -116,33 +97,17 @@ class LstmCrf:
         pass
 
 
-def predict(model_path, test_data, token_dict, i2label):
-    model = load_model(model_path, custom_objects={'CRF': CRF,
-                                                   'crf_loss': crf_loss,
-                                                   'crf_viterbi_accuracy': crf_viterbi_accuracy})
-
-    x_index = [[token_dict.get(word) for word in sen] for sen in test_data]
-    x_padding = seq_padding(x_index, 140)
-    out = model.predict(x_padding)
-    out = np.argmax(out, axis=2)
-    out = [[i2label.get(str(word)) for word in sentence]for sentence in out]
-    return out
-
-
 if __name__ == '__main__':
-    ROOT_PATH = '/content/drive/My Drive/NER/'
+    ROOT_PATH = '/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/lstm_crf/'
     path = ROOT_PATH + 'data/raw_data/dataset.jsonl'
-    model_path = ROOT_PATH + 'lstm_crf/lstm_crf.h5'
+    model_path = ROOT_PATH + 'lstm_crf.h5'
     data = read_jsonline(path)
     train_data = data[:int(len(data) * 0.8)]
     val_data = data[int(len(data) * 0.8):]
     token_dict = read_json(ROOT_PATH + 'data/raw_data/token2i.json')
     label_dict = read_json(ROOT_PATH + 'data/raw_data/label2i.json')
     i2label = {str(v): str(i) for i, v in label_dict.items()}
-    # generator = Data_generator(train_data, token_dict, label_dict)
-    # v_generator = Data_generator(val_data, token_dict, label_dict)
-    # lstm_crf = LstmCrf(token_dict, generator, v_generator)
-    # lstm_crf.train()
-
-    test_data = [i['word'] for i in val_data]
-    predict(model_path, test_data, token_dict, i2label)
+    generator = Data_generator(train_data, token_dict, label_dict)
+    v_generator = Data_generator(val_data, token_dict, label_dict)
+    lstm_crf = LstmCrf(token_dict, generator, v_generator)
+    lstm_crf.train()

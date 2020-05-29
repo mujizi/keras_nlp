@@ -14,6 +14,7 @@ __pycache__/
 /MRC/data/
 /NER/lstm_crf/data/
 /NER/CCKS_2017/data/
+/NER/CCKS_2017/electra/
 
 
 .Python
