@@ -43,8 +43,9 @@ class DataTransfer:
                 for r in res:
                     r = r.strip().split('\t')
                     tag, s_i, e_i, feature = r[0], int(r[1]), int(r[2]), r[3]
+
                     feature = self.cn2en_dict.get(feature)
-                    for i in (s_i, e_i + 1):
+                    for i in range(s_i, e_i + 1):
                         if i == s_i:
                             tag_l[i] = 'B-' + feature
                         else:

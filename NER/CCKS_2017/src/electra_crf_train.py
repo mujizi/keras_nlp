@@ -2,12 +2,18 @@
 # @Time    : 2020/5/29 下午2:36
 # @Author  : Benqi
 
-import tqdm
+import os
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+import random
 import codecs
 import numpy as np
+from tqdm import tqdm
 from tools import read_jsonline
+from evalution import get_ner_fmeasure
 from constant import dict_path, config_path, checkpoint_path
-
+from bert4keras.snippets import ViterbiDecoder
 from bert4keras.backend import keras, K
 from bert4keras.models import build_transformer_model
 from bert4keras.tokenizers import Tokenizer
@@ -16,8 +22,6 @@ from bert4keras.snippets import open, ViterbiDecoder
 from bert4keras.layers import ConditionalRandomField
 from keras.layers import Dense
 from keras.models import Model
-from keras.utils import to_categorical
-from keras.callbacks import EarlyStopping, ModelCheckpoint
 
 
 def seq_padding(x, pad_len, value=0):
@@ -31,14 +35,14 @@ class OurTokenizer(Tokenizer):
             if c in self._token_dict:
                 R.append(c)
             elif self._is_space(c):
-                R.append('[unused1]') # space类用未经训练的[unused1]表示
+                R.append('[unused1]')  # space类用未经训练的[unused1]表示
             else:
-                R.append('[UNK]') # 剩余的字符是[UNK]
+                R.append('[UNK]')  # 剩余的字符是[UNK]
         return R
 
 
 class Data_generator:
-    def __init__(self, data, dict_path, label_dict, max_len, batch_size=1):
+    def __init__(self, data, dict_path, label_dict, max_len, batch_size=40):
         self.data = data
         self.batch_size = batch_size
         self.dict_path = dict_path
@@ -100,80 +104,56 @@ class PretrainCrf:
         output_layer = 'Transformer-%s-FeedForward-Norm' % (12 - 1)
         output = model.get_layer(output_layer).output
         output = Dense(11)(output)
-        self.CRF = ConditionalRandomField(lr_multiplier=1000)
+        self.CRF = ConditionalRandomField(lr_multiplier=100)
         output = self.CRF(output)
 
         model = Model(model.input, output)
         model.summary()
         model.compile(loss=self.CRF.sparse_loss,
-                      optimizer=Adam(1e-5),
+                      optimizer=Adam(1e-4),
                       metrics=[self.CRF.sparse_accuracy]
-        )
+                      )
         return model
 
     def train(self, eva):
-        self.model.fit_generator(generator.__iter__(),
+        self.model.fit_generator(self.generator.__iter__(),
                                  steps_per_epoch=len(self.generator),
-                                 epochs=3,
+                                 epochs=100,
                                  callbacks=[eva])
-
-
-def viterbi_decode(nodes, trans):
-    """Viterbi算法求最优路径
-    其中nodes.shape=[seq_len, num_labels],
-        trans.shape=[num_labels, num_labels].
-    """
-    labels = np.arange(11).reshape((1, -1))
-    scores = nodes[0].reshape((-1, 1))
-    scores[1:] -= np.inf  # 第一个标签必然是0
-    paths = labels
-    for l in range(1, len(nodes)):
-        M = scores + trans + nodes[l].reshape((1, -1))
-        idxs = M.argmax(0)
-        scores = M.max(0).reshape((-1, 1))
-        paths = np.concatenate([paths[:, idxs], labels], 0)
-    return paths[:, scores[0].argmax()]
 
 
 def named_entity_recognize(text, model, CRF, id2class):
     """命名实体识别函数
     """
     tokens = tokenizer.tokenize(text)
+    # print(tokens)
+    # print('token', len(tokens))
+
     while len(tokens) > 512:
         tokens.pop(-2)
     token_ids = tokenizer.tokens_to_ids(tokens)
     segment_ids = [0] * len(token_ids)
     nodes = model.predict([[token_ids], [segment_ids]])[0]
     trans = K.eval(CRF.trans)
-    labels = viterbi_decode(nodes, trans)[1:-1]
-    entities, starting = [], False
-    for token, label in zip(tokens[1:-1], labels):
-        if label > 0:
-            if label % 2 == 1:
-                starting = True
-                entities.append([[token], id2class[(label - 1) // 2]])
-            elif starting:
-                entities[-1][0].append(token)
-            else:
-                starting = False
-        else:
-            starting = False
-    return [(tokenizer.decode(w, w).replace(' ', ''), l) for w, l in entities]
+    labels = ViterbiDecoder(trans).decode(nodes)[1:-1]
+    return labels
 
 
 def evaluate(data, model, crf, i2tag_dict):
-    """评测函数
-    """
-    X, Y, Z = 1e-10, 1e-10, 1e-10
+    pre_list = []
+    true_list = []
     for d in tqdm(data):
-        text = ''.join([i[0] for i in d])
-        R = set(named_entity_recognize(text, model, crf, i2tag_dict))
-        T = set([tuple(i) for i in d if i[1] != 'O'])
-        X += len(R & T)
-        Y += len(R)
-        Z += len(T)
-    f1, precision, recall = 2 * X / (Y + Z), X / Y, X / Z
-    return f1, precision, recall
+        text = ''.join(d['content'][:510])
+        true = d['tag'][:510]
+        r = named_entity_recognize(text, model, crf, i2tag_dict)
+        r = [i2tag_dict.get(str(i)) for i in r]
+        pre_list.append(r)
+        print('pred:', r)
+        true_list.append(true)
+        print("True:", true)
+        print('_______')
+    a, p, r, f = get_ner_fmeasure(true_list, pre_list, label_type="BIO")
+    return f, p, r
 
 
 class Evaluate(keras.callbacks.Callback):
@@ -187,7 +167,6 @@ class Evaluate(keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         trans = K.eval(self.CRF.trans)
-        print(trans)
         f1, precision, recall = evaluate(self.valid_data, self.model, self.CRF, self.i2tag_dict)
         # 保存最优
         if f1 >= self.best_val_f1:
@@ -195,15 +174,16 @@ class Evaluate(keras.callbacks.Callback):
             self.model.save_weights('./best_model.weights')
         print('valid:  f1: %.5f, precision: %.5f, recall: %.5f, best f1: %.5f\n' %
               (f1, precision, recall, self.best_val_f1))
-        f1, precision, recall = evaluate(self.test_data, self.model, self.CRF, self.i2tag_dict)
-        print('test:  f1: %.5f, precision: %.5f, recall: %.5f\n' %
-              (f1, precision, recall))
+        # f1, precision, recall = evaluate(self.test_data, self.model, self.CRF, self.i2tag_dict)
+        # print('test:  f1: %.5f, precision: %.5f, recall: %.5f\n' %
+        #       (f1, precision, recall))
 
 
 if __name__ == '__main__':
-    ROOT_PATH = '/Users/ouhon/PycharmProjects/keras_nlp_tutorial/NER/'
-    path = ROOT_PATH + 'CCKS_2017/data/raw_data/data.jsonl'
+    ROOT_PATH = '/content/drive/My Drive/'
+    path = ROOT_PATH + 'CCKS_2017/data/raw_data/data2.jsonl'
     data = read_jsonline(path)
+    random.shuffle(data)
 
     tag2i_dict = {'O': 0,
                   'B-TREATMENT': 1,
@@ -217,18 +197,19 @@ if __name__ == '__main__':
                   'B-DISEASE': 9,
                   'I-DISEASE': 10}
 
-    i2tag_dict = {str(v): str(i) for i, v in tag2i_dict.items()}
+    i2tag_dict = {str(v): k for k, v in tag2i_dict.items()}
     max_len = max([len(i['content']) for i in data])
     num = int(len(data) * 0.8)
+
     train_data = data[:num]
-    val_data = data[num:]
+    val_data = data[num:num + 50]
     test_data = data[num:]
-    generator = Data_generator(train_data, dict_path, tag2i_dict, 256)
-    v_generator = Data_generator(val_data, dict_path, tag2i_dict, 256)
+    generator = Data_generator(train_data, dict_path, tag2i_dict, 512)
+    v_generator = Data_generator(val_data, dict_path, tag2i_dict, 512)
     tokenizer = generator.tokenizer
-    bert_crf = PretrainCrf(dict_path, config_path, checkpoint_path, generator)
-    eva = Evaluate(bert_crf.model, bert_crf.CRF, i2tag_dict, val_data, test_data)
-    bert_crf.train(eva)
+    electra_crf = PretrainCrf(dict_path, config_path, checkpoint_path, generator)
+    eva = Evaluate(electra_crf.model, electra_crf.CRF, i2tag_dict, val_data, test_data)
+    electra_crf.train(eva)
 
 
 
