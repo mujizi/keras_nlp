@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d352a1b8-390e-4752-9ca6-4eefb8bc7de1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2017/src/evalution.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NER/CCKS_2017/src/data_transfer.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/CCKS_2017/src/data_transfer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NER/CCKS_2017/src/electra_crf_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/CCKS_2017/src/electra_crf_train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +41,7 @@
       <recent name="$PROJECT_DIR$/text_classification/data/toutiao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test1">
+  <component name="RunManager" selected="Python.del_no_label_data">
     <configuration name="data_transfer" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="keras_nlp_tutorial" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -58,6 +55,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/NER/CCKS_2017/src/data_transfer.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="del_no_label_data" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="keras_nlp_tutorial" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/NER/CCKS_2017/src" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/NER/CCKS_2017/src/del_no_label_data.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -108,27 +126,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="test1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="keras_nlp_tutorial" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/NER/CCKS_2017/src" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/NER/CCKS_2017/src/test1.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="visual" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="keras_nlp_tutorial" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -154,12 +151,12 @@
       <item itemvalue="Python.electra_crf_train" />
       <item itemvalue="Python.visual" />
       <item itemvalue="Python.evalution" />
-      <item itemvalue="Python.test1" />
       <item itemvalue="Python.data_transfer" />
+      <item itemvalue="Python.del_no_label_data" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test1" />
+        <item itemvalue="Python.del_no_label_data" />
         <item itemvalue="Python.data_transfer" />
         <item itemvalue="Python.evalution" />
         <item itemvalue="Python.electra_crf_train" />
