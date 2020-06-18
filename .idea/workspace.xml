@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d352a1b8-390e-4752-9ca6-4eefb8bc7de1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/NER/CCKS_2017/src/del_no_label_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/NER/CCKS_2017/src/del_no_label_data.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
