@@ -15,6 +15,7 @@ __pycache__/
 /NER/lstm_crf/data/
 /NER/CCKS_2017/data/
 /NER/CCKS_2017/electra/
+/NER/CCKS_2020_task3/dataset/
 
 
 .Python
