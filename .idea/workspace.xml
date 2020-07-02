@@ -2,18 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d352a1b8-390e-4752-9ca6-4eefb8bc7de1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/preprocess/cut_sentence.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/preprocess/e2label.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/preprocess/entities2label.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/utils/constant.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/utils/highlight.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/utils/io.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/utils/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/visual/dataset_review.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NER/CCKS_2020_task3/src/visual/sentence_len.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NER/未命名.ipynb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
